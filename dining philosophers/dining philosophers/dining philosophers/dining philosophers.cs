@@ -6,6 +6,19 @@ using System.Threading;
 using System.Threading.Tasks;
 
 
+/*
+ * 
+ * Author: Jerome Solomon
+ * Description: Dining Philosophers' C# solution using C# monitor
+ * Class: COEN283 Operating Systems
+ * Professor: Amr Elkady
+ * 
+ * Homework 2 question/assignment.  Solve the diners philosphers problem using monitors
+ * 
+ */
+
+
+
 namespace dining_philosophers
 {
     class Program
