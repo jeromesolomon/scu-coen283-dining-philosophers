@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,10 +27,15 @@ namespace dining_philosophers
     class Program
     {
 
+        // monitor lock object
         static object monitorObject = new object();
 
+        // philosphers structures
         const int nPhilosophers = 5;
         static bool[] chopsticksAvailable = new bool[nPhilosophers];
+
+        // max seconds a philospher can wait without eating (before marked as starving (dead lock))
+        const int maxWaitSeconds = 6;
 
         static void Eat(Object arg)
         {
@@ -39,6 +45,8 @@ namespace dining_philosophers
             Random rnd = new Random();
             int waitMiliseconds;
 
+            bool starving = false;
+
             // Console.WriteLine("philosopher " + p + " is hungry and trying to eat.");
 
             // assume both left and right chopstick are not available
@@ -46,8 +54,12 @@ namespace dining_philosophers
             bool rightAvailable = false;
 
 
+            // create a timestamp to gauge how long philosopher is without food
+            DateTime start = DateTime.Now;
+            int secondsStart = start.Second;
+
             // wait until both left and right chopsticks are available
-            while ((!leftAvailable) || (!rightAvailable))
+            while (((!leftAvailable) || (!rightAvailable))  && (!starving))
             {
 
                 // check the left chopsticks
@@ -66,30 +78,51 @@ namespace dining_philosophers
                     chopsticksAvailable[(p + 1) % nPhilosophers] = false;
                 }
 
+                // if you have one chopstick or more, report it
                 if (leftAvailable || rightAvailable)
                 {
-                    string msg = "philosopher " + p + " left available = " + leftAvailable + "\tright available = " + rightAvailable;
+                    string msg = "philosopher " + p + " has a chopstick:" + "\tleft = " + leftAvailable + "\tright = " + rightAvailable;
                     Console.WriteLine(msg);
+                }
+
+                // if you dont have both chopsticks and you have been hungry for a long while, you are starving
+                if ((!leftAvailable) || (!rightAvailable))
+                {
+                    DateTime curr = DateTime.Now;
+
+                    int secondsCurr = curr.Second;
+
+                    if (secondsCurr - secondsStart > maxWaitSeconds)
+                    {
+                        starving = true;
+                    }
                 }
             }
 
-            // simulate time to eat
-            waitMiliseconds = rnd.Next(100, 1000);
-            Thread.Sleep(waitMiliseconds);
+            if (starving)
+            {
+                Console.WriteLine("philosopher " + p + " starved to death.  Deadlock!");
+            }
+            else
+            {
+                // simulate time to eat
+                waitMiliseconds = rnd.Next(100, 1000);
+                Thread.Sleep(waitMiliseconds);
 
-            // release the chopsticks
-            chopsticksAvailable[p] = true;
-            chopsticksAvailable[(p + 1) % nPhilosophers] = true;
+                // release the chopsticks
+                chopsticksAvailable[p] = true;
+                chopsticksAvailable[(p + 1) % nPhilosophers] = true;
 
 
-            Console.WriteLine("philosopher " + p + " ate food.");
+                Console.WriteLine("philosopher " + p + " ate food.");
+            }
 
         }
 
         static void Main(string[] args)
         {
 
-            Console.WriteLine("Initializing the structures");
+            // Console.WriteLine("Initializing the structures");
 
             // initialize the structuures
             for (int i = 0; i < nPhilosophers; i++)
