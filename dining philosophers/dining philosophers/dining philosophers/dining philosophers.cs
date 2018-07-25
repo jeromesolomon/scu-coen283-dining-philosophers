@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 
+
 /*
  * 
  * Author: Jerome Solomon
@@ -19,53 +20,104 @@ using System.Threading.Tasks;
 
 
 
+
 namespace dining_philosophers
 {
     class Program
     {
+
+        static object monitorObject = new object();
+
+        const int nPhilosophers = 5;
+        static bool[] chopsticksAvailable = new bool[nPhilosophers];
+
+        static void Eat(Object arg)
+        {
+
+            int p = (int)arg;
+
+            Random rnd = new Random();
+            int waitMiliseconds;
+
+            // Console.WriteLine("philosopher " + p + " is hungry and trying to eat.");
+
+            // assume both left and right chopstick are not available
+            bool leftAvailable = false;
+            bool rightAvailable = false;
+
+
+            // wait until both left and right chopsticks are available
+            while ((!leftAvailable) || (!rightAvailable))
+            {
+
+                // check the left chopsticks
+                leftAvailable = chopsticksAvailable[p];
+
+                if (leftAvailable)
+                {
+                    chopsticksAvailable[p] = false;
+                }
+
+                // check the right chopsticks
+                rightAvailable = chopsticksAvailable[(p + 1) % nPhilosophers];
+
+                if (rightAvailable)
+                {
+                    chopsticksAvailable[(p + 1) % nPhilosophers] = false;
+                }
+
+                if (leftAvailable || rightAvailable)
+                {
+                    string msg = "philosopher " + p + " left available = " + leftAvailable + "\tright available = " + rightAvailable;
+                    Console.WriteLine(msg);
+                }
+            }
+
+            // simulate time to eat
+            waitMiliseconds = rnd.Next(100, 1000);
+            Thread.Sleep(waitMiliseconds);
+
+            // release the chopsticks
+            chopsticksAvailable[p] = true;
+            chopsticksAvailable[(p + 1) % nPhilosophers] = true;
+
+
+            Console.WriteLine("philosopher " + p + " ate food.");
+
+        }
+
         static void Main(string[] args)
         {
-            List<Task> tasks = new List<Task>();
-            Random rnd = new Random();
-            long total = 0;
-            int n = 0;
 
-            for (int taskCtr = 0; taskCtr < 10; taskCtr++)
-                tasks.Add(Task.Run(() => {
-                    int[] values = new int[10000];
-                    int taskTotal = 0;
-                    int taskN = 0;
-                    int ctr = 0;
-                    Monitor.Enter(rnd);
-                    // Generate 10,000 random integers
-                    for (ctr = 0; ctr < 10000; ctr++)
-                        values[ctr] = rnd.Next(0, 1001);
-                    Monitor.Exit(rnd);
-                    taskN = ctr;
-                    foreach (var value in values)
-                        taskTotal += value;
+            Console.WriteLine("Initializing the structures");
 
-                    Console.WriteLine("Mean for task {0,2}: {1:N2} (N={2:N0})",
-                                      Task.CurrentId, (taskTotal * 1.0) / taskN,
-                                      taskN);
-                    Interlocked.Add(ref n, taskN);
-                    Interlocked.Add(ref total, taskTotal);
-                }));
-            try
+            // initialize the structuures
+            for (int i = 0; i < nPhilosophers; i++)
             {
-                Task.WaitAll(tasks.ToArray());
-                Console.WriteLine("\nMean for all tasks: {0:N2} (N={1:N0})",
-                                  (total * 1.0) / n, n);
+                chopsticksAvailable[i] = true;
+            }
+
+            Thread[] threadArray = new Thread[nPhilosophers];
+
+            for (int i = 0; i < nPhilosophers; i++)
+            {
+          
+                threadArray[i] = new Thread(new ParameterizedThreadStart(Eat));
+
+                threadArray[i].Name = "Thread #" + i.ToString();
+                threadArray[i].Start(i);
 
             }
-            catch (AggregateException e)
+
+            // wait for all of the threads to complete
+            for (int i = 0; i < nPhilosophers; i++)
             {
-                foreach (var ie in e.InnerExceptions)
-                    Console.WriteLine("{0}: {1}", ie.GetType().Name, ie.Message);
+                threadArray[i].Join();
             }
 
             Console.WriteLine("Press any key to continue:");
-            Console.ReadLine();
+            Console.Read();
+
         }
     }
 }
