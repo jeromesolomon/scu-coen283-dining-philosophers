@@ -1,0 +1,26 @@
+
+
+Dining Philosophers Problem
+
+
+Type 'y' to use monitors for the problem:
+y
+Using a monitor to solve the problem.
+
+philosopher 2 is hungry and trying to eat.
+philosopher 3 is hungry and trying to eat.
+philosopher 1 is hungry and trying to eat.
+philosopher 0 is hungry and trying to eat.
+philosopher 4 is hungry and trying to eat.
+philosopher 2 has a chopstick:  left = True     right = True
+philosopher 2 ate food.
+philosopher 3 has a chopstick:  left = True     right = True
+philosopher 3 ate food.
+philosopher 0 has a chopstick:  left = True     right = True
+philosopher 0 ate food.
+philosopher 1 has a chopstick:  left = True     right = True
+philosopher 1 ate food.
+philosopher 4 has a chopstick:  left = True     right = True
+philosopher 4 ate food.
+
+Press any key to continue:
