@@ -12,7 +12,8 @@ using System.Threading.Tasks;
  * 
  * Author: Jerome Solomon
  * Description: Dining Philosophers' C# solution using C# monitor
- * Class: COEN283 Operating Systems
+ * 7/25/2018
+ * Class: SCU COEN283 Operating Systems
  * Professor: Amr Elkady
  * 
  * Homework 2 question/assignment.  Solve the diners philosphers problem using monitors
