@@ -1,4 +1,4 @@
-# Dining Philosophers Solutions
+# Dining Philosophers Solution
 
 This is a multi-threaded solution to the Dining Philosopheres problem written in C#.  The solution simulates both the deadlocked condition (without using monitor) and a solution by using a Monitor to allow only one philosopher to eat at a time (one thread to enter the monitor). 
 
